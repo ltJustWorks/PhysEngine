@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SDL.h>
 
 const char DATA_PATH[] = "C:\\temp\\trajectory.dat";
 
@@ -46,20 +47,37 @@ void handleWallCollision(Particle *p, double boxSize, double restitution) {
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_Window* window = SDL_CreateWindow("Particle Simulation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 400, 400, SDL_WINDOW_SHOWN);
+    if (!window) {
+        std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        return -1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        std::cerr << "Failed to create renderer: " << SDL_GetError() << std::endl;
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
+
     Particle particle;
 
     // Initial conditions
-    particle.x = 5.0;
-    particle.y = 5.0;
+    particle.x = 400.0;
+    particle.y = 300.0;
     particle.z = 5.0;
     particle.vx = 1.0; // Initial velocity along the x-axis
     particle.vy = 0.5; // Initial velocity along the y-axis
     particle.vz = -0.5; // Initial velocity along the z-axis
 
-    double dt = 0.01; // Time step
-    double totalTime = 20.0; // Total simulation time
-    double boxSize = 10.0; // Size of the bounding box
+    double dt = 0.1; // Time step
+    double totalTime = 1200.0; // Total simulation time
+    double boxSize = 400.0; // Size of the bounding box
     double restitution = 0.9; // Coefficient of restitution
 
     FILE *outputFile = fopen(DATA_PATH, "w");
@@ -81,8 +99,28 @@ int main() {
         updatePosition(&particle, dt);
         handleWallCollision(&particle, boxSize, restitution);
 
+        // Rendering
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+
+        // Draw the particle
+        //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        //SDL_RenderDrawPoint(renderer, (int)particle.x, (int)particle.y);
+
+        // Draw a filled rectangle (or square) around the particle position
+        int rectSize = 5; // Set the size of the rectangle
+        SDL_Rect rect = { (int)particle.x - rectSize / 2, (int)particle.y - rectSize / 2, rectSize, rectSize };
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Set color to black
+        SDL_RenderFillRect(renderer, &rect);
+
+        SDL_RenderPresent(renderer);
+
         fprintf(outputFile, "%.2f\t%.2f\t%.2f\t%.2f\n", t, particle.x, particle.y, particle.z);
     }
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     fclose(outputFile);
     printf("data saved\n");
