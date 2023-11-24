@@ -1,5 +1,6 @@
 #include <iostream>
-#include <stdio.h>
+
+const char DATA_PATH[] = "C:\\temp\\trajectory.dat";
 
 typedef struct {
     double x, y, z; // Position
@@ -61,7 +62,7 @@ int main() {
     double boxSize = 10.0; // Size of the bounding box
     double restitution = 0.9; // Coefficient of restitution
 
-    FILE *outputFile = fopen("C:\\temp\\trajectory.dat", "w");
+    FILE *outputFile = fopen(DATA_PATH, "w");
     if (outputFile == nullptr) {
         perror("fopen");
         return 1;
