@@ -22,20 +22,26 @@ void updateVelocity(Particle *p, double ax, double ay, double az, double dt) {
 
 void handleWallCollision(Particle *p, double boxSize, double restitution) {
     // Bounce off walls
-    if (p->x < 0 || p->x > boxSize) {
-        p->vx *= -restitution;
-        if (p->x < 0) p->x = 0;
-        else p->x = boxSize;
+    if (p->x < 0) {
+        p->x = 0;
+        p->vx = -p->vx * restitution;
+    } else if (p->x > boxSize) {
+        p->x = boxSize;
+        p->vx = -p->vx * restitution;
     }
-    if (p->y < 0 || p->y > boxSize) {
-        p->vy *= -restitution;
-        if (p->y < 0) p->y = 0;
-        else p->y = boxSize;
+    if (p->y < 0) {
+        p->y = 0;
+        p->vy = -p->vy * restitution;
+    } else if (p->y > boxSize) {
+        p->y = boxSize;
+        p->vy = -p->vy * restitution;
     }
-    if (p->z < 0 || p->z > boxSize) {
-        p->vz *= -restitution;
-        if (p->z < 0) p->z = 0;
-        else p->z = boxSize;
+    if (p->z < 0) {
+        p->z = 0;
+        p->vz = -p->vz * restitution;
+    } else if (p->z > boxSize) {
+        p->z = boxSize;
+        p->vz = -p->vz * restitution;
     }
 }
 
@@ -50,8 +56,8 @@ int main() {
     particle.vy = 0.5; // Initial velocity along the y-axis
     particle.vz = -0.5; // Initial velocity along the z-axis
 
-    double dt = 0.1; // Time step
-    double totalTime = 30.0; // Total simulation time
+    double dt = 0.01; // Time step
+    double totalTime = 20.0; // Total simulation time
     double boxSize = 10.0; // Size of the bounding box
     double restitution = 0.9; // Coefficient of restitution
 
